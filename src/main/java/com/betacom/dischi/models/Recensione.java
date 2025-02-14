@@ -89,13 +89,7 @@ public class Recensione {
 		this.dataCreazione = dataCreazione;
 	}
 
-	@Override
-	public String toString() {
-		return "Recensione [idRecensione=" + idRecensione + ", descrizione=" + descrizione + ", stelle=" + stelle
-				+ ", dataCreazione=" + dataCreazione + ", cliente=" + cliente + ", prodotti=" + prodotti + "]";
-	}
-	
-	
+
 
 
 }

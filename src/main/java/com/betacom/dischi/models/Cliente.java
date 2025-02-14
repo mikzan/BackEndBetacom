@@ -195,14 +195,6 @@ public class Cliente {
 	
 	
 
-	@Override
-	public String toString() {
-		return "Cliente [idCliente=" + idCliente + ", nome=" + nome + ", cognome=" + cognome + ", telefono=" + telefono
-				+ ", immagineCliente=" + immagineCliente + ", dataRegistrazione=" + dataRegistrazione + ", indirizzo="
-				 + ", ordini=" + ordini + ", carrello=" + carrello + ", utente=" + utente + ", wishlist="
-				+ wishlist + ", recensioni=" + recensioni + "]";
-	}
-
 
 	
 }
