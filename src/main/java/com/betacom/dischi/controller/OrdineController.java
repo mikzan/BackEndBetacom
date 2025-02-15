@@ -2,6 +2,7 @@ package com.betacom.dischi.controller;
 
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,7 +18,9 @@ import com.betacom.dischi.response.ResponseBase;
 import com.betacom.dischi.response.ResponseList;
 import com.betacom.dischi.response.ResponseObject;
 import com.betacom.dischi.services.interfaces.OrdineService;
+import com.betacom.dischi.services.interfaces.SystemMsgServices;
 
+@CrossOrigin(origins="*")
 @RestController
 @RequestMapping("/rest/ordine")
 public class OrdineController {
@@ -28,6 +31,9 @@ public class OrdineController {
 	@Autowired
 	OrdineService ordineServ;
 	
+	@Autowired
+	private SystemMsgServices msgServ;
+	
 	@PostMapping("/create")
 	public ResponseBase create(@RequestBody(required = true) OrdineRequest request) {
 		log.debug("Aggiungi prodotto: " + request);
@@ -35,7 +41,7 @@ public class OrdineController {
 		response.setRc(true);
 		try {
 			ordineServ.create(request);
-			response.setMsg("Ordine inviato con successo");
+			response.setMsg(msgServ.getSysMsg("order_confirm"));
 		} catch (CustomException e) {
 			log.error(e.getMessage());
 			response.setRc(false);
@@ -52,7 +58,7 @@ public class OrdineController {
 		response.setRc(true);
 		try {
 			ordineServ.delete(request);
-			response.setMsg("Ordine eliminato con successo");
+			response.setMsg(msgServ.getSysMsg("delete_order_confirm"));
 		} catch (CustomException e) {
 			log.error(e.getMessage());
 			response.setRc(false);
@@ -69,7 +75,7 @@ public class OrdineController {
 		response.setRc(true);
 		try {
 			ordineServ.update(request);
-			response.setMsg("Ordine aggiornato con successo");
+			response.setMsg(msgServ.getSysMsg("update_order_confirm"));
 		} catch (CustomException e) {
 			log.error(e.getMessage());
 			response.setRc(false);
@@ -85,7 +91,7 @@ public class OrdineController {
 		ResponseList<OrdineDTO> response = new ResponseList<OrdineDTO>();
 		response.setRc(true);
 		try {	
-			response.setMsg("Ordini effettuati");
+			response.setMsg(msgServ.getSysMsg("order_list"));
 			response.setDati(ordineServ.listaByCliente(id));
 		} catch (CustomException e) {
 			log.error(e.getMessage());

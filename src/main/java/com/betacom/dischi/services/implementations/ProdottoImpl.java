@@ -21,6 +21,7 @@ import com.betacom.dischi.repository.IRecensioneRepository;
 import com.betacom.dischi.request.ProdottoRequest;
 import com.betacom.dischi.services.interfaces.ProdottoService;
 import com.betacom.dischi.utilities.enums.Formato;
+import static com.betacom.dischi.utilities.Utility.buildProdottoDTO;
 
 import jakarta.transaction.Transactional;
 
@@ -105,23 +106,7 @@ public class ProdottoImpl implements ProdottoService{
 		List<Prodotto> listaFiltrata = prodottoRepository.prodottiFiltrati(idProdotto,titolo, artista, genere, annoPubblicazione);
 	
 		List<ProdottoDTO> risultato = listaFiltrata.stream()
-				.map(p -> new ProdottoDTO.Builder()
-						.idProdotto(p.getIdProdotto())
-						.formato(p.getFormato().toString())
-						.titolo(p.getTitolo())
-						.artista(p.getArtista())
-						.genere(p.getGenere())
-						.descrizione(p.getDescrizione())
-						.annoPubblicazione(p.getAnnoPubblicazione())
-						.prezzo(p.getPrezzo())
-						.immagineProdotto(p.getImmagineProdotto())
-						.quantita(p.getQuantita())
-						.recensioni(p.getRecensioni().stream()
-								.map(r -> new RecensioneDTO.Builder()
-										.setDescrizione(r.getDescrizione())
-										.setStelle(r.getStelle())
-										.build()).toList())
-	                    .build()) 
+				.map(p -> buildProdottoDTO(p))
 	            .collect(Collectors.toList());  
 	    
 	    return risultato;
@@ -136,23 +121,7 @@ public class ProdottoImpl implements ProdottoService{
 		
 		
 		List<ProdottoDTO> risultato = listaFiltrata.stream()
-				.map(p -> new ProdottoDTO.Builder()
-						.idProdotto(p.getIdProdotto())
-						.formato(p.getFormato().toString())
-						.titolo(p.getTitolo())
-						.artista(p.getArtista())
-						.genere(p.getGenere())
-						.descrizione(p.getDescrizione())
-						.annoPubblicazione(p.getAnnoPubblicazione())
-						.prezzo(p.getPrezzo())
-						.immagineProdotto(p.getImmagineProdotto())
-						.quantita(p.getQuantita())
-						.recensioni(p.getRecensioni().stream()
-								.map(r -> new RecensioneDTO.Builder()
-										.setDescrizione(r.getDescrizione())
-										.setStelle(r.getStelle())
-										.build()).toList())
-	                    .build()) 
+				.map(p -> buildProdottoDTO(p)) 
 	            .collect(Collectors.toList());  
 	    
 	    return risultato;

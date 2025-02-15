@@ -41,7 +41,13 @@ public class CarrelloControllerTest {
 		request.setQuantita(1);
 		ResponseBase response = controller.addProdotto(request);
 		Assertions.assertThat(response.getRc()).isEqualTo(false);
-		Assertions.assertThat(response.getMsg()).isEqualTo("Cliente inesistente");
+		Assertions.assertThat(response.getMsg()).isEqualTo("no_customer");
+		request.setIdCliente(2);
+		request.setIdProdotto(2);
+		request.setQuantita(500);
+		response = controller.addProdotto(request);
+		Assertions.assertThat(response.getRc()).isEqualTo(false);
+		Assertions.assertThat(response.getMsg()).isEqualTo("no_qnt");
 	}
 	
 	@Test

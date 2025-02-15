@@ -35,61 +35,44 @@ public class Recensione {
 	@JoinColumn(name= "id_cliente" , nullable=false)
 	private Cliente cliente;
 	
-	@ManyToMany(fetch = FetchType.EAGER)
-	@JoinTable(name= "prodotto_recensione",
-				joinColumns = @JoinColumn(name="id_recensione"),
-				inverseJoinColumns = @JoinColumn(name="id_prodotto"))
-	private List<Prodotto> prodotti;
+	@ManyToOne
+	@JoinColumn(name="id_prodotto")
+	private Prodotto prodotto;
 	
-	public List<Prodotto> getProdotti() {
-		return prodotti;
+	public Prodotto getProdotto() {
+		return prodotto;
 	}
-
-	public void setProdotti(List<Prodotto> prodotti) {
-		this.prodotti = prodotti;
+	public void setProdotto(Prodotto prodotto) {
+		this.prodotto = prodotto;
 	}
-
 	public Integer getIdRecensione() {
 		return idRecensione;
 	}
-
 	public void setIdRecensione(Integer idRecensione) {
 		this.idRecensione = idRecensione;
 	}
-
 	public String getDescrizione() {
 		return descrizione;
 	}
-
 	public void setDescrizione(String descrizione) {
 		this.descrizione = descrizione;
 	}
-
 	public Cliente getCliente() {
 		return cliente;
 	}
-
 	public void setCliente(Cliente cliente) {
 		this.cliente = cliente;
 	}
-
 	public Integer getStelle() {
 		return stelle;
 	}
-
 	public void setStelle(Integer stelle) {
 		this.stelle = stelle;
 	}
-
 	public LocalDate getDataCreazione() {
 		return dataCreazione;
 	}
-
 	public void setDataCreazione(LocalDate dataCreazione) {
 		this.dataCreazione = dataCreazione;
 	}
-
-
-
-
 }

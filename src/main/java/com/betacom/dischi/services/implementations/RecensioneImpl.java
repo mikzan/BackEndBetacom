@@ -2,7 +2,6 @@ package com.betacom.dischi.services.implementations;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
@@ -18,12 +17,12 @@ import com.betacom.dischi.repository.IProdottoRepository;
 import com.betacom.dischi.repository.IRecensioneRepository;
 import com.betacom.dischi.request.RecensioneRequest;
 import com.betacom.dischi.services.interfaces.RecensioneService;
-import com.betacom.dischi.utilities.mapper.MapperClienteToDTO;
+import com.betacom.dischi.utilities.Utility;
+import static com.betacom.dischi.utilities.Utility.buildRecensioneDTO;
 
 @Service
 public class RecensioneImpl implements RecensioneService {
 	
-
 	private Logger log;
 	private IRecensioneRepository recensioneRepo;
 	private IClienteRepository clienteRepo;
@@ -43,15 +42,8 @@ public class RecensioneImpl implements RecensioneService {
 	public List<RecensioneDTO> listAll(Integer idRecensione,Integer stelle) {
 	    List<Recensione> listaRecensioni = recensioneRepo.filteredReviews(idRecensione, stelle); 
 	    return listaRecensioni.stream()
-	            .map(rece -> new RecensioneDTO.Builder()
-	                    .setIdRecensione(rece.getIdRecensione())
-	                    .setDescrizione(rece.getDescrizione())
-	                    .setStelle(rece.getStelle())
-	                    .setCliente(MapperClienteToDTO.mapClienteToDTO(rece.getCliente()))  
-	                    // MANCA LA DATA RECENSIONE
-	                    .setProdotti(null) 
-	                    .build())  
-	            .collect(Collectors.toList());
+	            .map(rece -> buildRecensioneDTO(rece))
+	            .toList();
 	}
 	
 	
@@ -87,13 +79,13 @@ public class RecensioneImpl implements RecensioneService {
 		recensione.setStelle(req.getStelle());
 		recensione.setDescrizione(req.getDescrizione());
 		recensione.setCliente(cliente);
-	    recensione.setProdotti(List.of(prodotto));  // unico prodotto 
+	    recensione.setProdotto(prodotto);  
 		recensione.setDataCreazione(LocalDate.now());
 
 		return recensione;
 	}
 	private void checkIfRecensioneAlreadyExists(Cliente cliente, Prodotto prodotto) throws CustomException {
-		Boolean recensioneEsistente = recensioneRepo.existsByClienteAndProdotti(cliente, prodotto);
+		Boolean recensioneEsistente = recensioneRepo.existsByClienteAndProdotto(cliente, prodotto);
 		if(recensioneEsistente) 
 			throw new CustomException();
 	}
@@ -123,14 +115,13 @@ public class RecensioneImpl implements RecensioneService {
 			throw new CustomException("Il numero di stelle deve essere un valore tra 1 e 5");
 		}
 	}
+	
 	@Override
 	public RecensioneDTO listById(Integer id) throws CustomException {
 	    Recensione recensione = recensioneRepo.findById(id)
 	            .orElseThrow(() -> new CustomException("Recensione non trovata"));
-	    List<RecensioneDTO> recensioneCliente = MapperClienteToDTO.mapRecensioni(recensione.getCliente()).stream()
-	            .filter(rece -> rece.getIdRecensione().equals(id)) 
-	            .collect(Collectors.toList()); 
-	    RecensioneDTO recensioneFiltrata = recensioneCliente.get(0);
-	    return recensioneCliente.isEmpty() ? null : recensioneFiltrata;
+	    RecensioneDTO recensioneDTO = Utility.buildRecensioneDTO(recensione);  
+	    return recensioneDTO;
 	}
+
 }

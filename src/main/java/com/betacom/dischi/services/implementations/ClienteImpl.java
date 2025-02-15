@@ -3,7 +3,6 @@ package com.betacom.dischi.services.implementations;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +14,8 @@ import com.betacom.dischi.models.Cliente;
 import com.betacom.dischi.repository.IClienteRepository;
 import com.betacom.dischi.request.ClienteRequest;
 import com.betacom.dischi.services.interfaces.ClienteService;
-import com.betacom.dischi.utilities.mapper.MapperClienteToDTO;
-
+import com.betacom.dischi.utilities.Utility;
+import static com.betacom.dischi.utilities.Utility.*;
 @Service
 public class ClienteImpl implements ClienteService {
 
@@ -30,7 +29,8 @@ public class ClienteImpl implements ClienteService {
 	@Override
 	public List<ClienteDTO> listAll(Integer idCliente,String nome,String cognome) {
 		List<Cliente> listaClienti = clienteRepo.filteredClients(idCliente, nome, cognome);
-		return listaClienti.stream().map(MapperClienteToDTO::mapClienteToDTO).collect(Collectors.toList());
+		return listaClienti.stream()
+				.map(c -> buildClienteDTO(c)).toList();
 	}
 
 	@Override
@@ -68,7 +68,7 @@ public class ClienteImpl implements ClienteService {
 		log.debug("Visualizzazione dati cliente con ID: " + id);
 		Cliente cliente = clienteRepo.findById(id)
 				.orElseThrow(() -> new CustomException("Cliente con id " + id + " non trovato"));
-		return MapperClienteToDTO.mapClienteToDTO(cliente);
+		return Utility.buildClienteDTO(cliente);
 	}
 
 	private void checkAndSetFields(ClienteRequest req, Cliente cliente) throws CustomException {

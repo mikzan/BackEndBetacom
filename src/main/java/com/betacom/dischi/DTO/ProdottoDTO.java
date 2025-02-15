@@ -2,6 +2,11 @@ package com.betacom.dischi.DTO;
 
 import java.util.List;
 
+import com.betacom.dischi.models.ProdottoCarrello;
+import com.betacom.dischi.models.Wishlist;
+
+import jakarta.persistence.ManyToMany;
+
 public class ProdottoDTO {
 
 
@@ -29,8 +34,11 @@ public class ProdottoDTO {
 	
 	private List<RecensioneDTO> recensioni;
 	
+	private List<ProdottoCarrelloDTO> prodottiCarrello;
 	
-		
+	private List<WishlistDTO> prodottiWishlist;
+	
+
 
 	private ProdottoDTO() {
 		super();
@@ -49,24 +57,28 @@ public class ProdottoDTO {
 		private String immagineProdotto;		
 		private List<OrdineDTO> ordini;		
 		private List<RecensioneDTO> recensioni;
+		private List<ProdottoCarrelloDTO> prodottiCarrello;
+		private List<WishlistDTO> prodottiWishlist;
 		
 		public Builder() {	
 		}
 		
 		public ProdottoDTO build() {
 		 ProdottoDTO prodotto = new ProdottoDTO();
-		 prodotto.idProdotto = this.idProdotto;
-		 prodotto.formato = this.formato;
-		 prodotto.titolo = this.titolo;
-		 prodotto.artista = this.artista;
-		 prodotto.genere = this.genere;
-		 prodotto.descrizione = this.descrizione;
-		 prodotto.annoPubblicazione = this.annoPubblicazione;
-		 prodotto.prezzo = this.prezzo;
-		 prodotto.immagineProdotto = this.immagineProdotto;
-		 prodotto.quantita = this.quantita;
-		 prodotto.ordini = this.ordini;
-		 prodotto.recensioni = this.recensioni;
+			 prodotto.idProdotto = this.idProdotto;
+			 prodotto.formato = this.formato;
+			 prodotto.titolo = this.titolo;
+			 prodotto.artista = this.artista;
+			 prodotto.genere = this.genere;
+			 prodotto.descrizione = this.descrizione;
+			 prodotto.annoPubblicazione = this.annoPubblicazione;
+			 prodotto.prezzo = this.prezzo;
+			 prodotto.immagineProdotto = this.immagineProdotto;
+			 prodotto.quantita = this.quantita;
+			 prodotto.ordini = this.ordini;
+			 prodotto.recensioni = this.recensioni;
+			 prodotto.prodottiCarrello=this.prodottiCarrello;
+			 prodotto.prodottiWishlist=this.prodottiWishlist;
 		
 		 return prodotto;
 		 
@@ -130,6 +142,16 @@ public class ProdottoDTO {
 		public Builder recensioni(List<RecensioneDTO> recensioni) {
 			this.recensioni = recensioni;
 			return this;
+		}
+
+		public Builder prodottiCarrello(List<ProdottoCarrelloDTO> prodottiCarrello) {
+			this.prodottiCarrello = prodottiCarrello;
+			return this;
+		}
+
+		public Builder prodottiWishlist(List<WishlistDTO> prodottiWishlist) {
+			this.prodottiWishlist = prodottiWishlist;
+			return this;
 		}	
 		
 		
@@ -184,4 +206,13 @@ public class ProdottoDTO {
 	public List<RecensioneDTO> getRecensioni() {
 		return recensioni;
 	}
+
+	public List<ProdottoCarrelloDTO> getProdottiCarrello() {
+		return prodottiCarrello;
+	}
+
+	public List<WishlistDTO> getProdottiWishlist() {
+		return prodottiWishlist;
+	}
+	
 }

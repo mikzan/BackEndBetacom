@@ -14,11 +14,11 @@ import com.betacom.dischi.models.Recensione;
 
 public interface IRecensioneRepository extends JpaRepository<Recensione,Integer>  {
 
-	Optional<Recensione> findByClienteAndProdotti(Cliente cliente,Prodotto prodotto) throws CustomException;
+	Optional<Recensione> findByClienteAndProdotto(Cliente cliente,Prodotto prodotto) throws CustomException;
 
-	Boolean existsByClienteAndProdotti(Cliente cliente,Prodotto prodotto) throws CustomException;
+	Boolean existsByClienteAndProdotto(Cliente cliente,Prodotto prodotto) throws CustomException;
 
-	List<Recensione> findByProdotti(Prodotto prodotto) throws CustomException;
+	List<Recensione> findByProdotto(Prodotto prodotto) throws CustomException;
 
 	@Query(name="recensioni.filteredReviews")
 	List<Recensione> filteredReviews(

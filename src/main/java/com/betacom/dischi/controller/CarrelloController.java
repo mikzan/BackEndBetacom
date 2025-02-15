@@ -2,6 +2,7 @@ package com.betacom.dischi.controller;
 
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,7 +16,9 @@ import com.betacom.dischi.request.CarrelloRequest;
 import com.betacom.dischi.response.ResponseBase;
 import com.betacom.dischi.response.ResponseObject;
 import com.betacom.dischi.services.interfaces.CarrelloService;
+import com.betacom.dischi.services.interfaces.SystemMsgServices;
 
+@CrossOrigin(origins="*")
 @RestController
 @RequestMapping("/rest/carrello")
 public class CarrelloController {
@@ -26,6 +29,9 @@ public class CarrelloController {
 	@Autowired
 	CarrelloService carrelloServ;
 	
+	@Autowired
+	private SystemMsgServices msgServ;
+	
 	@PostMapping("/add")
 	public ResponseBase addProdotto(@RequestBody(required = true) CarrelloRequest request) {
 		log.debug("Aggiungi prodotto: " + request);
@@ -33,7 +39,7 @@ public class CarrelloController {
 		response.setRc(true);
 		try {
 			carrelloServ.addProdotto(request);
-			response.setMsg("Prodotto aggiunto con successo");
+			response.setMsg(msgServ.getSysMsg("add_cart_confirm"));
 		} catch (CustomException e) {
 			log.error(e.getMessage());
 			response.setRc(false);
@@ -49,7 +55,7 @@ public class CarrelloController {
 		response.setRc(true);
 		try {
 			carrelloServ.removeProdotto(request);
-			response.setMsg("Prodotto rimosso con successo");
+			response.setMsg(msgServ.getSysMsg("remove_cart_confirm"));
 		} catch (CustomException e) {
 			log.error(e.getMessage());
 			response.setRc(false);
@@ -65,7 +71,7 @@ public class CarrelloController {
 		response.setRc(true);
 		try {
 			carrelloServ.delete(request);
-			response.setMsg("Carrello eliminato con successo");
+			response.setMsg(msgServ.getSysMsg("delete_cart_confirm"));
 		} catch (CustomException e) {
 			log.error(e.getMessage());
 			response.setRc(false);
@@ -80,7 +86,7 @@ public class CarrelloController {
 		ResponseObject<CarrelloDTO> response = new ResponseObject<CarrelloDTO>();
 		response.setRc(true);
 		try {	
-			response.setMsg("Prodotti nel carrello");
+			response.setMsg(msgServ.getSysMsg("cart_list"));
 			response.setDati(carrelloServ.listaProdotti(id));
 		} catch (CustomException e) {
 			log.error(e.getMessage());

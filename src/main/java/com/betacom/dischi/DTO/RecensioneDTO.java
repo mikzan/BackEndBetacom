@@ -1,86 +1,55 @@
 package com.betacom.dischi.DTO;
 
 import java.time.LocalDate;
-import java.util.List;
-
 
 public class RecensioneDTO {
 
 	private Integer idRecensione;
-	
-
 	private String descrizione;
-	
-
 	private Integer stelle;
-	
 	private LocalDate dataCreazione;
-	
-	
 	private ClienteDTO cliente;
-	
-
-	private List<ProdottoDTO> prodotti;
-	
+	private ProdottoDTO prodotto;
 	
 	private RecensioneDTO() {}
 
     public static class Builder{
     	private Integer idRecensione;
-    	
-
     	private String descrizione;
-    	
-
     	private Integer stelle;
-    	
     	private LocalDate dataCreazione;
-
-    	
-    	
     	private ClienteDTO cliente;
-    	
+    	private ProdottoDTO prodotto;
 
-    	private List<ProdottoDTO> prodotti;
-
-
-		public Builder setIdRecensione(Integer idRecensione) {
+		public Builder idRecensione(Integer idRecensione) {
 			this.idRecensione = idRecensione;
 			return this;
 		}
 
-
-		public Builder setDescrizione(String descrizione) {
+		public Builder descrizione(String descrizione) {
 			this.descrizione = descrizione;
 			return this;
 		}
 
-
-		public Builder setStelle(Integer stelle) {
+		public Builder stelle(Integer stelle) {
 			this.stelle = stelle;
 			return this;
 		}
 
-
-		public Builder setCliente(ClienteDTO cliente) {
+		public Builder cliente(ClienteDTO cliente) {
 			this.cliente = cliente;
 			return this;
 		}
 
-
-		public Builder setProdotti(List<ProdottoDTO> prodotti) {
-			this.prodotti = prodotti;
+		public Builder prodotto(ProdottoDTO prodotto) {
+			this.prodotto = prodotto;
 			return this;
 		}
 		
-		
-		
-		
-		public Builder setDataCreazione(LocalDate dataCreazione) {
+		public Builder dataCreazione(LocalDate dataCreazione) {
 			this.dataCreazione = dataCreazione;
 			return this;
 		}
-
 
 		public RecensioneDTO build() {
 			RecensioneDTO recDTO = new RecensioneDTO();
@@ -89,47 +58,35 @@ public class RecensioneDTO {
 			recDTO.stelle = this.stelle;
 			recDTO.dataCreazione=this.dataCreazione;
 			recDTO.cliente = this.cliente;
-			recDTO.prodotti= this.prodotti;
+			recDTO.prodotto= this.prodotto;
 		
 			return recDTO;
 		}
-    	
-    	
-    }
 
+    }
 
 	@Override
 	public String toString() {
 		return "RecensioneDTO [idRecensione=" + idRecensione + ", descrizione=" + descrizione + ", stelle=" + stelle
 				+ ", cliente=" + cliente + "]";
 	}
-
-
 	public Integer getIdRecensione() {
 		return idRecensione;
 	}
-
-
 	public String getDescrizione() {
 		return descrizione;
 	}
-
 	public Integer getStelle() {
 		return stelle;
 	}
-
 	public ClienteDTO getCliente() {
 		return cliente;
 	}
-
-	public List<ProdottoDTO> getProdotti() {
-		return prodotti;
+	public ProdottoDTO getProdotto() {
+		return prodotto;
 	}
-
-
 	public LocalDate getDataCreazione() {
 		return dataCreazione;
 	}
 
-	
 }

@@ -3,41 +3,61 @@ package com.betacom.dischi.DTO;
 import java.util.List;
 
 public class WishlistDTO {
-	
-	 private Integer idWishlist;
-	 private List<Integer> prodottiId;  
-	 private Integer clienteId; 
+    
+    private Integer idWishlist;
+    private List<ProdottoDTO> prodotti;
+    private ClienteDTO cliente;
+    
+    private WishlistDTO() {
+        super();
+    }
 
-	public WishlistDTO() {}
-	 
-	public WishlistDTO(Integer idWishlist, List<Integer> prodottiIds, Integer clienteId) {
-		super();
-		this.idWishlist = idWishlist;
-		this.prodottiId = prodottiIds;
-		this.clienteId = clienteId;
-	}
+    public static class Builder {
+        private Integer idWishlist;
+        private List<ProdottoDTO> prodotti;
+        private ClienteDTO cliente;
+   
+        public Builder() {
+        }
 
-	public Integer getIdWishlist() {
-	    return idWishlist;
-	}
-	
-	public void setIdWishlist(Integer idWishlist) {
-	    this.idWishlist = idWishlist;
-	}
-	
-	public List<Integer> getProdottiIds() {
-	    return prodottiId;
-	}
-	
-	public void setProdottiIds(List<Integer> prodottiIds) {
-	    this.prodottiId = prodottiIds;
-	}
-	
-	public Integer getClienteId() {
-	    return clienteId;
-	}
-	
-	public void setClienteId(Integer clienteId) {
-	    this.clienteId = clienteId;
-	}
+        public WishlistDTO build() {
+            WishlistDTO wishlist = new WishlistDTO();
+            wishlist.idWishlist = this.idWishlist;
+            wishlist.prodotti = this.prodotti;
+            wishlist.cliente = this.cliente;
+            return wishlist;
+        }
+
+        public Builder idWishlist(Integer idWishlist) {
+            this.idWishlist = idWishlist;
+            return this;
+        }
+
+        public Builder prodotti(List<ProdottoDTO> prodotti) {
+            this.prodotti = prodotti;
+            return this;
+        }
+
+        public Builder cliente(ClienteDTO cliente) {
+            this.cliente = cliente;
+            return this;
+        }
+    }
+
+    public Integer getIdWishlist() {
+        return idWishlist;
+    }
+
+    public List<ProdottoDTO> getProdotti() {
+        return prodotti;
+    }
+
+    public ClienteDTO getCliente() {
+        return cliente;
+    }
+
+    @Override
+    public String toString() {
+        return "WishlistDTO [idWishlist=" + idWishlist + ", prodotti=" + prodotti + ", cliente=" + cliente + "]";
+    }
 }

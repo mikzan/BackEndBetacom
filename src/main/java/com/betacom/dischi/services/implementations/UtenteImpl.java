@@ -2,12 +2,9 @@ package com.betacom.dischi.services.implementations;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-
 import org.slf4j.Logger;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import com.betacom.dischi.DTO.SignInDTO;
 import com.betacom.dischi.DTO.UtenteDTO;
 import com.betacom.dischi.exception.CustomException;
@@ -19,10 +16,8 @@ import com.betacom.dischi.request.SignInRequest;
 import com.betacom.dischi.request.UtenteRequest;
 import com.betacom.dischi.services.interfaces.UtenteService;
 import com.betacom.dischi.utilities.enums.Roles;
-import com.betacom.dischi.utilities.mapper.MapperClienteToDTO;
-
 import jakarta.transaction.Transactional;
-
+import static com.betacom.dischi.utilities.Utility.*;
 @Service
 public class UtenteImpl implements UtenteService{
 
@@ -105,14 +100,8 @@ public class UtenteImpl implements UtenteService{
 	public List<UtenteDTO> listAll(Integer idUtente,String username,String email) {
 	    List<Utente> listaUtenti = utenteRepo.filteredUsers(idUtente, username, email);
 	    return listaUtenti.stream()
-	            .map(u -> new UtenteDTO.Builder()
-	                    .setIdUtente(u.getIdUtente())
-	                    .setUsername(u.getUsername())
-	                    .setRoles(u.getRoles().toString()) 
-	                    .setEmail(u.getEmail())
-	                    .setCliente(null)  // 
-	                    .build())
-	            .collect(Collectors.toList());
+	            .map(u -> buildUtenteDTO(u)) 
+	            .toList();
 	}
 	
 	@Transactional
@@ -150,7 +139,7 @@ public class UtenteImpl implements UtenteService{
 			utente.setRoles(Roles.valueOf(req.getRoles()));
 		}
 		// TODO: EMAIL
-		utente.setEmail(req.getEmail());
+		req.setEmail(req.getEmail());
 		utenteRepo.save(utente);
 		
 	}
@@ -160,9 +149,7 @@ public class UtenteImpl implements UtenteService{
 		log.debug("Visualizzazione dati utente con ID: " + id);
 	    Utente utente = utenteRepo.findById(id)
 	    		.orElseThrow(() -> new CustomException("Utente non trovato"));
-		return MapperClienteToDTO.mapUtente(utente.getCliente());
-}
-	
-	
-	
+		return buildUtenteDTO(utente);
+	}
+
 }

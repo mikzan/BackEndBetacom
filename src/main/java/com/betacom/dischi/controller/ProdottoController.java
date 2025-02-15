@@ -2,6 +2,7 @@ package com.betacom.dischi.controller;
 
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,7 +16,7 @@ import com.betacom.dischi.response.ResponseList;
 import com.betacom.dischi.services.interfaces.ProdottoService;
 import com.betacom.dischi.utilities.enums.Formato;
 
-
+@CrossOrigin(origins="*")
 @RestController
 @RequestMapping("/rest/prodotto")
 public class ProdottoController {

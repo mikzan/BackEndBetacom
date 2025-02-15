@@ -3,24 +3,19 @@ package com.betacom.dischi.request;
 import java.util.List;
 
 public class WishlistRequest {
-	private Integer idWishlist;
-	private List<Integer> idProdotto;  
-    private Integer Idcliente; 
+    private Integer idCliente;
+    private List<Integer> idProdotti;
+    private Integer idWishlist;
+
+    public WishlistRequest() {}
 
     
+    
 
-	@Override
-	public String toString() {
-		return "WishListRequest [prodottiId=" + idProdotto + ", clienteId=" + Idcliente + ", getProdottiIds()="
-				+ getProdottiIds() + ", getClienteId()=" + getClienteId() + ", getClass()=" + getClass()
-				+ ", hashCode()=" + hashCode() + ", toString()=" + super.toString() + "]";
-	}
-	
-	
-
-	public Integer getIdWishlist() {
+    public Integer getIdWishlist() {
 		return idWishlist;
 	}
+
 
 
 
@@ -30,43 +25,20 @@ public class WishlistRequest {
 
 
 
-	public List<Integer> getIdProdotto() {
-		return idProdotto;
-	}
 
-
-
-	public void setIdProdotto(List<Integer> idProdotto) {
-		this.idProdotto = idProdotto;
-	}
-
-
-
-	public Integer getIdcliente() {
-		return Idcliente;
-	}
-
-
-
-	public void setIdcliente(Integer idcliente) {
-		Idcliente = idcliente;
-	}
-
-
-
-	public List<Integer> getProdottiIds() {
-        return idProdotto;
+	public Integer getIdCliente() {
+        return idCliente;
     }
 
-    public void setProdottiIds(List<Integer> prodottiIds) {
-        this.idProdotto = prodottiIds;
+    public void setIdCliente(Integer idCliente) {
+        this.idCliente = idCliente;
     }
 
-    public Integer getClienteId() {
-        return Idcliente;
+    public List<Integer> getIdProdotti() {
+        return idProdotti;
     }
 
-    public void setClienteId(Integer clienteId) {
-        this.Idcliente = clienteId;
+    public void setIdProdotti(List<Integer> idProdotti) {
+        this.idProdotti = idProdotti;
     }
 }

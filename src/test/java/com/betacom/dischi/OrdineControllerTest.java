@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.betacom.dischi.DTO.OrdineDTO;
+import com.betacom.dischi.controller.CarrelloController;
 import com.betacom.dischi.controller.OrdineController;
+import com.betacom.dischi.request.CarrelloRequest;
 import com.betacom.dischi.request.OrdineRequest;
 import com.betacom.dischi.response.ResponseBase;
 import com.betacom.dischi.response.ResponseList;
@@ -20,6 +22,9 @@ public class OrdineControllerTest {
 
 	@Autowired
 	OrdineController controller;
+	
+	@Autowired
+	CarrelloController controllerP;
 	
 	@Test
 	@Order(1)
@@ -52,19 +57,38 @@ public class OrdineControllerTest {
 	
 	@Test
 	@Order(5)
+	public void addProdottoPerSuccessivo(){
+		CarrelloRequest request = new CarrelloRequest();
+		request.setIdCliente(2);
+		request.setIdProdotto(2);
+		request.setQuantita(1);
+		ResponseBase response = controllerP.addProdotto(request);
+		Assertions.assertThat(response.getRc()).isEqualTo(true);
+	}
+	@Test
+	@Order(6)
+	public void creaOrdineSuccessivo(){
+		OrdineRequest request = new OrdineRequest();
+		request.setIdCliente(2);
+		ResponseBase response = controller.create(request);
+		Assertions.assertThat(response.getRc()).isEqualTo(true);
+	}
+	
+	@Test
+	@Order(7)
 	public void updateOrdinePost(){
 		OrdineRequest request = new OrdineRequest();
-		request.setIdOrdine(1);
+		request.setIdOrdine(2);
 		request.setSpedito(false);
 		ResponseBase response = controller.update(request);
 		Assertions.assertThat(response.getRc()).isEqualTo(true);
 	}
 	
 	@Test
-	@Order(6)
+	@Order(8)
 	public void deleteOrdine(){
 		OrdineRequest request = new OrdineRequest();
-		request.setIdOrdine(1);
+		request.setIdOrdine(2);
 		ResponseBase response = controller.delete(request);
 		Assertions.assertThat(response.getRc()).isEqualTo(true);
 	}

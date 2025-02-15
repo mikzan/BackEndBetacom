@@ -23,28 +23,28 @@ public class UtenteDTO {
 		public Builder() {}
 
 	
-		public Builder setIdUtente(Integer idUtente) {
+		public Builder idUtente(Integer idUtente) {
 			this.idUtente = idUtente;
 			return this;
 		}
 
-		public Builder setUsername(String username) {
+		public Builder username(String username) {
 			this.username = username;
 			return this;
 		}
 
-		public Builder setEmail(String email) {
+		public Builder email(String email) {
 			this.email = email;
 			return this;
 		}
 
 		
-		public Builder setRoles(String roles) {
+		public Builder roles(String roles) {
 			this.roles = roles;
 			return this;
 		}
 
-		public Builder setCliente(ClienteDTO cliente) {
+		public Builder cliente(ClienteDTO cliente) {
 			this.cliente = cliente;
 			return this;
 		}

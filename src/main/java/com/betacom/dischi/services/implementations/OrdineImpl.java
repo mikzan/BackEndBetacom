@@ -1,5 +1,7 @@
 package com.betacom.dischi.services.implementations;
 
+import static com.betacom.dischi.utilities.Utility.buildOrdineDTO;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,8 +10,6 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import com.betacom.dischi.DTO.OrdineDTO;
-import com.betacom.dischi.DTO.ProdottoDTO;
-import com.betacom.dischi.DTO.ProdottoOrdineDTO;
 import com.betacom.dischi.exception.CustomException;
 import com.betacom.dischi.models.Carrello;
 import com.betacom.dischi.models.Cliente;
@@ -25,6 +25,7 @@ import com.betacom.dischi.repository.IProdottoOrdineRepository;
 import com.betacom.dischi.repository.IProdottoRepository;
 import com.betacom.dischi.request.OrdineRequest;
 import com.betacom.dischi.services.interfaces.OrdineService;
+import com.betacom.dischi.services.interfaces.SystemMsgServices;
 
 import jakarta.transaction.Transactional;
 
@@ -37,20 +38,22 @@ public class OrdineImpl implements OrdineService{
 	private IProdottoCarrelloRepository joinCarrelloRepo;
 	private IOrdineRepository ordineRepo;
 	private IProdottoOrdineRepository joinOrdineRepo;
+	private SystemMsgServices msgServ;
 	
 	public OrdineImpl(IClienteRepository clienteRepo,
-			ICarrelloRepository carrelloRepo,
-			IProdottoRepository prodottoRepo,
-			IProdottoCarrelloRepository joinCarrelloRepo,
-			IOrdineRepository ordineRepo,
-			IProdottoOrdineRepository joinOrdineRepo
-			) {
+						ICarrelloRepository carrelloRepo,
+						IProdottoRepository prodottoRepo,
+						IProdottoCarrelloRepository joinCarrelloRepo,
+						IOrdineRepository ordineRepo,
+						IProdottoOrdineRepository joinOrdineRepo,
+						SystemMsgServices msgServ) {
 		this.clienteRepo = clienteRepo;
 		this.carrelloRepo = carrelloRepo;
 		this.prodottoRepo = prodottoRepo;
 		this.joinCarrelloRepo = joinCarrelloRepo;
 		this.ordineRepo = ordineRepo;
 		this.joinOrdineRepo = joinOrdineRepo;
+		this.msgServ = msgServ;
 	}
 	
 	@Override
@@ -58,11 +61,11 @@ public class OrdineImpl implements OrdineService{
 	public void create(OrdineRequest request) throws CustomException {
 		Optional<Cliente> cliente = clienteRepo.findById(request.getIdCliente());
 		if (cliente.isEmpty()) {
-			throw new CustomException("Cliente inesistente");
+			throw new CustomException(msgServ.getSysMsg("no_customer"));
 		}
 		Carrello carrello = cliente.get().getCarrello();
 		if (carrello == null || carrello.getProdotti().isEmpty()) {
-			throw new CustomException("il carrello è vuoto");
+			throw new CustomException(msgServ.getSysMsg("no_cart"));
 		}
 		Ordine ordine = new Ordine();
 		ordine.setCliente(cliente.get());
@@ -95,10 +98,10 @@ public class OrdineImpl implements OrdineService{
 	public void delete(OrdineRequest request) throws CustomException {
 		Optional<Ordine> ordine = ordineRepo.findById(request.getIdOrdine());
 		if (ordine.isEmpty()) {
-			throw new CustomException("L'ordine non esiste");
+			throw new CustomException(msgServ.getSysMsg("no_order"));
 		}
 		if (ordine.get().getSpedito()) {
-			throw new CustomException("L'ordine è già stato spedito, non si può eliminare");
+			throw new CustomException(msgServ.getSysMsg("shipping_order"));
 		}
 		for (ProdottoOrdine prodOrd : ordine.get().getProdotti()) {
 			Prodotto prodotto = prodOrd.getProdotto();
@@ -114,10 +117,10 @@ public class OrdineImpl implements OrdineService{
 	public void update(OrdineRequest request) throws CustomException {
 		Optional<Ordine> ordine = ordineRepo.findById(request.getIdOrdine());
 		if (ordine.isEmpty()) {
-			throw new CustomException("L'ordine non esiste");
+			throw new CustomException(msgServ.getSysMsg("no_order"));
 		}
 		if (ordine.get().getSpedito()) {
-			throw new CustomException("L'ordine è già stato spedito, non si può aggiornare");
+			throw new CustomException(msgServ.getSysMsg("shipping_order"));
 		}
 		if (request.getSpedito() == null) {
 			ordine.get().setSpedito(false);
@@ -132,28 +135,11 @@ public class OrdineImpl implements OrdineService{
 	public List<OrdineDTO> listaByCliente(Integer id) throws CustomException {
 		Optional<Cliente> cliente = clienteRepo.findById(id);
 		if (cliente.isEmpty()) {
-			throw new CustomException("Cliente inesistente");
+			throw new CustomException(msgServ.getSysMsg("no_customer"));
 		}
 		List<Ordine> ordini = cliente.get().getOrdini();
 		return ordini.stream()
-				.map(ordine -> new OrdineDTO.Builder()
-						.idOrdine(ordine.getIdOrdine())
-						.dataOrdine(ordine.getDataOrdine())
-						.spedito(ordine.getSpedito())
-						.totaleImporto(ordine.getTotaleImporto())
-						.prodotti(ordine.getProdotti().stream()
-								.map(prodotto -> new ProdottoOrdineDTO.Builder()
-										.prezzoAcquisto(prodotto.getPrezzoAcquisto())
-										.quantita(prodotto.getQuantita())
-										.prodotto(new ProdottoDTO.Builder()
-														.idProdotto(prodotto.getProdotto().getIdProdotto())
-														.titolo(prodotto.getProdotto().getTitolo())
-														.artista(prodotto.getProdotto().getArtista())
-														.immagineProdotto(prodotto.getProdotto().getImmagineProdotto())
-												.build())
-										.build())
-								.toList())
-						.build())
+				.map(ordine -> buildOrdineDTO(ordine))
 				.toList();
 	}
 

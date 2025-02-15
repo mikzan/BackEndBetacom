@@ -1,19 +1,28 @@
 package com.betacom.dischi.services.interfaces;
 
-import java.util.List;
 
-import com.betacom.dischi.DTO.WishlistDTO;
+import java.util.List;
+import java.util.Optional;
+
+import com.betacom.dischi.DTO.ProdottoDTO;
+import com.betacom.dischi.exception.CustomException;
+import com.betacom.dischi.models.Prodotto;
+import com.betacom.dischi.models.Wishlist;
 import com.betacom.dischi.request.WishlistRequest;
+
 
 public interface WishlistService {
 
-    List<WishlistDTO> listAll();    
-
     void create(WishlistRequest req) throws Exception;
     
-    void update(WishlistRequest req) throws Exception;
+    void addProductToWishlist(Integer idCliente, Integer idProdotto) throws CustomException;
+
+    void removeProductFromWishlist(Integer idCliente, Integer idProdotto) throws CustomException;
+
+    void clearWishlist(Integer idCliente) throws CustomException;
     
-    void delete(WishlistRequest req) throws Exception;
+    List<ProdottoDTO> getWishlistProducts(Integer idCliente) throws CustomException;
     
-    WishlistDTO getById(Integer id) throws Exception; 
+    Optional<Wishlist> searchWishlistById(Integer idWishlist) throws CustomException;
+
 }
