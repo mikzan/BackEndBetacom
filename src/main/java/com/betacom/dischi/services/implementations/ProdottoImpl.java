@@ -1,8 +1,9 @@
 package com.betacom.dischi.services.implementations;
 
+import static com.betacom.dischi.utilities.Utility.buildProdottoDTO;
 import static com.betacom.dischi.utilities.Utility.validazioneValoriProdotto;
 
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -21,7 +22,6 @@ import com.betacom.dischi.repository.IRecensioneRepository;
 import com.betacom.dischi.request.ProdottoRequest;
 import com.betacom.dischi.services.interfaces.ProdottoService;
 import com.betacom.dischi.utilities.enums.Formato;
-import static com.betacom.dischi.utilities.Utility.buildProdottoDTO;
 
 import jakarta.transaction.Transactional;
 
@@ -39,9 +39,14 @@ public class ProdottoImpl implements ProdottoService{
 	
 
 	@Override
-	public void create(ProdottoRequest req) throws CustomException {
+	public void create(ProdottoRequest req) throws Exception {
 	
 		Prodotto prodotto = new Prodotto();
+	
+		Optional<Prodotto> prodottoCercato = prodottoRepository.findByTitoloAndArtista(req.getTitolo(), req.getArtista());
+		if(prodottoCercato.isPresent()) {
+			throw new Exception("Prodotto già esistente");
+		}
 		
 		validazioneValoriProdotto(req);
 		
@@ -126,6 +131,36 @@ public class ProdottoImpl implements ProdottoService{
 	    
 	    return risultato;
 	}
+
+
+
+	@Override
+	public List<ProdottoDTO> topTenProdotti() throws Exception {
+	    List<Prodotto> listaProdotti = prodottoRepository.findAll();
+	    
+	    List<Prodotto> risultato = listaProdotti.stream()
+	            .filter(prodotto -> prodotto.getRecensioni().size() != 0).collect(Collectors.toList());
+	   
+	    
+	    risultato.forEach(p-> p.getRecensioni().sort(new Comparator<Recensione>() {
+	    	@Override
+	    	public int compare(Recensione p1, Recensione p2) {
+	    		return p1.getStelle() - p2.getStelle();		
+	    				}
+		}));
+	    		risultato.sort(new Comparator<Prodotto>() {
+	    	@Override
+	    	public int compare(Prodotto p1, Prodotto p2) {
+	    		return p1.getRecensioni().get(0).getStelle() - p2.getRecensioni().get(0).getStelle();		
+	    				}
+		});
+	    		
+
+
+	    return risultato.stream().map(r-> buildProdottoDTO(r)).limit(10).toList();
+	}
+
+	
 	
 	
 	

@@ -1,6 +1,7 @@
 package com.betacom.dischi.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -10,6 +11,8 @@ import com.betacom.dischi.models.Prodotto;
 import com.betacom.dischi.utilities.enums.Formato;
 
 public interface IProdottoRepository extends JpaRepository<Prodotto, Integer>{
+	
+	Optional<Prodotto> findByTitoloAndArtista(String titolo, String artista);
 
 	@Query(name="prodotti.listaFiltrata")
 	List<Prodotto> prodottiFiltrati(
@@ -25,4 +28,5 @@ public interface IProdottoRepository extends JpaRepository<Prodotto, Integer>{
 	List<Prodotto> prodottiPerFormato(
 			@Param("formato") Formato formato
 			);
+
 }

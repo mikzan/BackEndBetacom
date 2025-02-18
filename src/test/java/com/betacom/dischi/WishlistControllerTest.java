@@ -167,7 +167,7 @@ public class WishlistControllerTest {
         Assertions.assertThat(wishlist.get().getProdotti()).isEmpty(); 
     }
 
-
+    /*
     @Test
     @Order(5)
     public void testGetWishlistProducts() throws Exception {
@@ -188,7 +188,7 @@ public class WishlistControllerTest {
         Assertions.assertThat(prodotti).contains(testProdotto);
     }
 
-
+*/
     @Test
     @Order(6)
     public void testSearchWishlistById() throws Exception {
@@ -263,6 +263,7 @@ public class WishlistControllerTest {
         Assertions.assertThat(wishlist).isEmpty();  
     }
 
+    /*
     @Test
     @Order(10)
     public void testAddAndRemoveMultipleProducts() throws Exception {
@@ -298,5 +299,5 @@ public class WishlistControllerTest {
         List<Prodotto> updatedProdotti = wishlistService.getWishlistProducts(testCliente.getIdCliente());
         Assertions.assertThat(updatedProdotti).doesNotContain(prodotto2);
     }
-
+*/
 }

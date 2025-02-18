@@ -19,4 +19,6 @@ public interface ProdottoService {
 			Integer annoPubblicazione) throws Exception;
 	
 	List<ProdottoDTO> listPerFormato(Formato formato) throws Exception;
+	
+	List<ProdottoDTO> topTenProdotti() throws Exception;
 }
