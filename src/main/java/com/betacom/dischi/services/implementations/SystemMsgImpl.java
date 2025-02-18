@@ -14,7 +14,7 @@ import com.betacom.dischi.services.interfaces.SystemMsgServices;
 @Service
 public class SystemMsgImpl implements SystemMsgServices{
 	
-	@Value("${lang_BE}")
+	@Value("${lang_be}")
 	private String language;
 	
 	@Autowired
