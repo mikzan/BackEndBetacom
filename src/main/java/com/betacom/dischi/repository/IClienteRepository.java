@@ -7,6 +7,9 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 
 import com.betacom.dischi.models.Cliente;
 
@@ -34,5 +37,21 @@ public interface IClienteRepository extends JpaRepository<Cliente,Integer> {
 			
 			
 			);
+	 // Nuovo metodo per paginazione
+    @Query("SELECT c FROM Cliente c WHERE (:idCliente IS NULL OR c.idCliente = :idCliente) " +
+            "AND (:nome IS NULL OR c.nome LIKE %:nome%) " +
+            "AND (:cognome IS NULL OR c.cognome LIKE %:cognome%) " +
+            "AND (:cap IS NULL OR c.cap LIKE %:cap%) " +
+            "AND (:comune IS NULL OR c.comune LIKE %:comune%) " +
+            "AND (:provincia IS NULL OR c.provincia LIKE %:provincia%)")
+    Page<Cliente> filteredClientsPageable(
+            @Param("idCliente") Integer idCliente,
+            @Param("nome") String nome,
+            @Param("cognome") String cognome,
+            @Param("cap") String cap,
+            @Param("comune") String comune,
+            @Param("provincia") String provincia,
+            Pageable pageable
+    );
 
 }

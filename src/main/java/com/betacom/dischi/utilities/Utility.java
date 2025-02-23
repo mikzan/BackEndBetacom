@@ -120,7 +120,7 @@ public class Utility {
 		}
 
 	 
-	public static ClienteDTO buildClienteDTO(Cliente cliente) {
+	public static ClienteDTO buildClienteDTO(Cliente cliente, int page, int size, int totalElements, int totalPages) {
 		return new ClienteDTO.Builder()
 				.idCliente(cliente.getIdCliente())
 				.nome(cliente.getNome())
@@ -137,6 +137,10 @@ public class Utility {
 				.utente(buildUtenteDTOnoCliente(cliente.getUtente())) //DA FARE
 			    .wishlist(buildWishlistDTO(cliente.getWishlist()))
 				.recensioni(cliente.getRecensioni().stream().map(r -> buildRecensioneDTO(r)).toList())
+                .page(page)
+                .size(size)
+                .totalElements(totalElements)
+                .totalPages(totalPages)
 				.build();
 	} 
 	private static UtenteDTO buildUtenteDTOnoCliente(Utente utente) {

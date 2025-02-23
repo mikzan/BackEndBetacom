@@ -2,6 +2,9 @@ package com.betacom.dischi.controller;
 
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,7 +31,9 @@ import com.betacom.dischi.services.interfaces.ClienteService;
 		ClienteService clienteService;
 		
 		
+
 		@GetMapping("/listAll")
+<<<<<<< Updated upstream
 		public ResponseList<ClienteDTO>list(Integer idCliente,String nome,String cognome) {
 			log.debug("Lista di tutti i clienti: ");
 			ResponseList<ClienteDTO> response = new ResponseList<ClienteDTO>();
@@ -44,8 +49,35 @@ import com.betacom.dischi.services.interfaces.ClienteService;
 			}
 			return response;
 			
+=======
+		public ResponseList<ClienteDTO> listAll(
+		    Integer idCliente, 
+		    String nome, 
+		    String cognome, 
+		    String cap, 
+		    String comune, 
+		    String provincia,
+		    @RequestParam(defaultValue = "0") int page, 
+		    @RequestParam(defaultValue = "10") int size 
+		) {
+		    log.debug("Lista paginata di clienti: ");
+		    ResponseList<ClienteDTO> response = new ResponseList<ClienteDTO>();
+		    response.setRc(true);
+		    try {
+		        Pageable pageable = PageRequest.of(page, size);
+		        Page<ClienteDTO> pageClienti = clienteService.listAll(idCliente, nome, cognome, cap, comune, provincia, pageable);
+		        response.setDati(pageClienti.getContent());
+		        response.setRc(true);
+		        response.setMsg("Visualizzazione lista clienti paginata");
+		    } catch (Exception e) {
+		        log.error(e.getMessage());
+		        response.setMsg(e.getMessage());
+		        response.setRc(false);
+		    }
+		    return response;
+>>>>>>> Stashed changes
 		}
-		
+
 		@GetMapping("/listById")
 		public ResponseObject<ClienteDTO> listById(@RequestParam Integer id){
 			log.debug("List " + id );

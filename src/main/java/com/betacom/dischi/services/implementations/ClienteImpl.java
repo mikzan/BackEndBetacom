@@ -6,6 +6,8 @@ import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.betacom.dischi.DTO.ClienteDTO;
@@ -26,12 +28,30 @@ public class ClienteImpl implements ClienteService {
 	IClienteRepository clienteRepo;
 
 	
+
 	@Override
+<<<<<<< Updated upstream
 	public List<ClienteDTO> listAll(Integer idCliente,String nome,String cognome) {
 		List<Cliente> listaClienti = clienteRepo.filteredClients(idCliente, nome, cognome);
 		return listaClienti.stream()
 				.map(c -> buildClienteDTO(c)).toList();
+=======
+	public Page<ClienteDTO> listAll(Integer idCliente, String nome, String cognome, String cap, String comune, String provincia, Pageable pageable) {
+	    Page<Cliente> pageClienti = clienteRepo.filteredClientsPageable(idCliente, nome, cognome, cap, comune, provincia, pageable);
+
+	    // Mappa la pagina di clienti in una pagina di ClienteDTO
+	    return pageClienti.map(cliente -> {
+	        int page = pageClienti.getNumber(); // Numero della pagina corrente
+	        int size = pageClienti.getSize(); // Numero di elementi per pagina
+	        int totalElements = (int) pageClienti.getTotalElements(); // Numero totale di clienti
+	        int totalPages = pageClienti.getTotalPages(); // Numero totale di pagine
+
+	        // Costruisci e restituisci il ClienteDTO con i parametri di paginazione
+	        return buildClienteDTO(cliente, page, size, totalElements, totalPages);
+	    });
+>>>>>>> Stashed changes
 	}
+
 
 	@Override
 	public void create(ClienteRequest req) throws CustomException {
@@ -65,11 +85,19 @@ public class ClienteImpl implements ClienteService {
 
 	@Override
 	public ClienteDTO listById(Integer id) throws CustomException {
-		log.debug("Visualizzazione dati cliente con ID: " + id);
-		Cliente cliente = clienteRepo.findById(id)
-				.orElseThrow(() -> new CustomException("Cliente con id " + id + " non trovato"));
-		return Utility.buildClienteDTO(cliente);
+	    log.debug("Visualizzazione dati cliente con ID: " + id);
+	    
+	    Cliente cliente = clienteRepo.findById(id)
+	            .orElseThrow(() -> new CustomException("Cliente con id " + id + " non trovato"));
+
+	    int page = 0; 
+	    int size = 1; 
+	    int totalElements = 1; 
+	    int totalPages = 1; 
+
+	    return Utility.buildClienteDTO(cliente, page, size, totalElements, totalPages);
 	}
+
 
 	private void checkAndSetFields(ClienteRequest req, Cliente cliente) throws CustomException {
 		if (req.getNome() == null || req.getNome().isBlank()) {
