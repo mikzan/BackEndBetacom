@@ -186,7 +186,7 @@ public class WishlistControllerTest {
 
 
     @Test
-    @Order(6)
+    @Order(6)   
     public void testSearchWishlistById() {
         WishlistRequest req = createWishlistRequest();
         wishlistController.create(req);
@@ -195,6 +195,45 @@ public class WishlistControllerTest {
 
         Assertions.assertThat(response.getRc()).isEqualTo(true);
         Assertions.assertThat(response.getMsg()).contains("Wishlist trovata con successo.");
+    }
+
+    @Test
+    @Order(7)
+    public void testCreateWishlistWithInvalidCliente() {
+        WishlistRequest req = new WishlistRequest();
+        req.setIdCliente(99999); // ID non esistente
+
+        ResponseBase response = wishlistController.create(req);
+
+        Assertions.assertThat(response.getRc()).isEqualTo(false);
+        Assertions.assertThat(response.getMsg()).containsIgnoringCase("cliente con ID: 99999 non trovato");
+
+    }  
+
+    @Test
+    @Order(8)
+    public void testRemoveProductNotInWishlist() {
+        WishlistRequest req = createWishlistRequest();
+        wishlistController.create(req);
+
+        req.setIdProdotti(List.of(99999)); // prodotto inesistente
+  
+        ResponseBase response = wishlistController.removeProduct(req);
+
+        Assertions.assertThat(response.getRc()).isEqualTo(false);
+        Assertions.assertThat(response.getMsg()).contains("Prodotto con ID: 99999 non trovato");
+    }
+
+    @Test
+    @Order(9)
+    public void testClearEmptyWishlist() {
+        WishlistRequest req = createWishlistRequest();
+        wishlistController.create(req);
+
+        ResponseBase response = wishlistController.clearWishlist(req);
+
+        Assertions.assertThat(response.getRc()).isEqualTo(true);
+        Assertions.assertThat(response.getMsg()).contains("Tutti i prodotti sono stati rimossi dalla wishlist.");
     }
 
 }
