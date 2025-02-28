@@ -22,8 +22,6 @@ public class ProdottoCarrelloDTO {
 		return quantita;
 	}
 	
-	//test
-	
 	public static class Builder {
 		private Integer id;
 		private CarrelloDTO carrello;
