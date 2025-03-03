@@ -45,7 +45,7 @@ public class UtenteImpl implements UtenteService{
 
     @Override
     @Transactional
-    public SignInDTO signIn(SignInRequest req) {
+    public SignInDTO signIn(SignInRequest req)   {
         log.debug("Signin utente: " + req.getUsername() + " " + req.getPassword());
         SignInDTO resp = new SignInDTO();
 
@@ -53,6 +53,7 @@ public class UtenteImpl implements UtenteService{
         
         if (utenteOpt.isEmpty()) {
             resp.setLogged(false);
+
         } else {
             Utente utente = utenteOpt.get();
             
@@ -73,6 +74,7 @@ public class UtenteImpl implements UtenteService{
                 resp.setUsername(utente.getUsername());
             } else {
                 resp.setLogged(false);
+
             }
         }
         return resp;
@@ -83,9 +85,9 @@ public class UtenteImpl implements UtenteService{
 @Override
 public boolean verifyCurrentPassword(Integer id, String currentPassword) throws CustomException{
 	Utente utente = utenteRepo.findById(id)
-			.orElseThrow(() -> new CustomException("Utente non trovato"));
+            .orElseThrow(() -> new CustomException(msgServ.getSysMsg("no_user")));
 	if(!passwordEncoder.matches(currentPassword, utente.getPassword())) {
-		throw new CustomException("Password corrente non corretta");
+        throw new CustomException(msgServ.getSysMsg("current_password_incorrect"));
 	}
 	return true;
 }
@@ -93,14 +95,16 @@ public boolean verifyCurrentPassword(Integer id, String currentPassword) throws 
 @Override
 public void changePassword(Integer idUtente, String currentPassword, String newPassword) throws CustomException {
     if (!verifyCurrentPassword(idUtente, currentPassword)) {
-        throw new CustomException("Password corrente non corretta");
+        throw new CustomException(msgServ.getSysMsg("current_password_incorrect"));
     }
     
     Utente utente = utenteRepo.findById(idUtente)
-            .orElseThrow(() -> new CustomException("Utente non trovato"));
+            .orElseThrow(() -> new CustomException(msgServ.getSysMsg("no_user")));
 
     utente.setPassword(passwordEncoder.encode(newPassword));
     utenteRepo.save(utente);
+    log.debug(msgServ.getSysMsg("password_changed"));
+
 }
 
 
@@ -114,7 +118,7 @@ public void createUser(UtenteRequest req) throws CustomException {
     log.debug("Crea utente: " + req);
     Optional<Utente> optUtente = utenteRepo.findByUsername(req.getUsername());
     if (optUtente.isPresent()) {
-        throw new CustomException("Utente con questo username già esistente");
+        throw new CustomException(msgServ.getSysMsg("username_exists"));
     }
     if (req.getRoles() == null) {
         req.setRoles("UTENTE");
@@ -123,7 +127,7 @@ public void createUser(UtenteRequest req) throws CustomException {
     Utente utente = new Utente();
     Optional<Utente> optUtenteByEmail = utenteRepo.findByEmail(req.getEmail());
     if (optUtenteByEmail.isPresent()) {
-        throw new CustomException("Un utente con questa email esiste già");
+        throw new CustomException(msgServ.getSysMsg("email_exists"));
     }else {
         utente.setEmail(req.getEmail());
     }
@@ -132,13 +136,13 @@ public void createUser(UtenteRequest req) throws CustomException {
         if (optCliente.isPresent()) {
             Cliente cliente = optCliente.get();
             if (cliente.getUtente() != null) {
-                throw new CustomException("Cliente già associato a un altro utente");
+                throw new CustomException(msgServ.getSysMsg("client_associated"));
             }
             utente.setCliente(cliente);
             cliente.setUtente(utente);
             clienteRepo.save(cliente); 
         } else {
-            throw new CustomException("Cliente non trovato");
+            throw new CustomException(msgServ.getSysMsg("no_customer"));
         }
     }
     utente.setPassword(passwordEncoder.encode(req.getPassword()));
@@ -146,6 +150,7 @@ public void createUser(UtenteRequest req) throws CustomException {
     utente.setUsername(req.getUsername());
 
     utenteRepo.save(utente);
+    log.debug(msgServ.getSysMsg("user_created"));
 
     
 }
@@ -163,13 +168,15 @@ public void createUser(UtenteRequest req) throws CustomException {
 	public void deleteUtente(Integer id) throws CustomException{
 		log.debug("Cancellazione utente con ID: "+id);
 		Utente utente = utenteRepo.findById(id)
-				.orElseThrow(() -> new CustomException("Utente non trovato"));
+                .orElseThrow(() -> new CustomException(msgServ.getSysMsg("no_user_for_delete")));
 		Cliente cliente = utente.getCliente();
 		if(cliente != null) {
 			cliente.setUtente(null);
 			clienteRepo.save(cliente);
 		}
 		utenteRepo.delete(utente);
+        log.debug(msgServ.getSysMsg("user_deleted"));
+
 
 	}
 
@@ -177,12 +184,12 @@ public void createUser(UtenteRequest req) throws CustomException {
 	public void updateUtente(UtenteRequest req) throws CustomException{
 	    log.debug("Aggiornamento utente con ID: "+req.getIdUtente());
 	    Utente utente = utenteRepo.findById(req.getIdUtente())
-	            .orElseThrow(() -> new CustomException("Utente non trovato"));
+                .orElseThrow(() -> new CustomException(msgServ.getSysMsg("no_user_for_update")));
 
 	    Optional<Utente> optUtente = utenteRepo.findByUsername(req.getUsername());
 	    if (!utente.getUsername().equals(req.getUsername())) {
 	        if (optUtente.isPresent()) {
-	            throw new CustomException("Utente con questo username già esistente");
+                throw new CustomException(msgServ.getSysMsg("username_exists"));
 	        }
 	        utente.setUsername(req.getUsername());
 	    }
@@ -197,13 +204,15 @@ public void createUser(UtenteRequest req) throws CustomException {
 
 	    if (req.getIdCliente() != null) {
 	        Cliente cliente = clienteRepo.findById(req.getIdCliente())
-	                .orElseThrow(() -> new CustomException("Cliente non trovato"));
+                    .orElseThrow(() -> new CustomException(msgServ.getSysMsg("no_customer")));
 	        utente.setCliente(cliente); 
 	    }
 
 	    utente.setEmail(req.getEmail());
 
 	    utenteRepo.save(utente);
+        log.debug(msgServ.getSysMsg("user_updated"));
+
 	}
 
 
@@ -211,7 +220,7 @@ public void createUser(UtenteRequest req) throws CustomException {
 	public UtenteDTO listById(Integer id) throws CustomException {
 		log.debug("Visualizzazione dati utente con ID: " + id);
 	    Utente utente = utenteRepo.findById(id)
-	    		.orElseThrow(() -> new CustomException("Utente non trovato"));
+                .orElseThrow(() -> new CustomException(msgServ.getSysMsg("no_user")));
 		return buildUtenteDTO(utente);
 	}
 
@@ -221,7 +230,7 @@ public void createUser(UtenteRequest req) throws CustomException {
 
 		List<Utente> listaFiltrata = utenteRepo.utentiPerRoles(roles);
 		if(listaFiltrata.isEmpty() || listaFiltrata == null)
-			throw new CustomException(msgServ.getSysMsg(""));
+            throw new CustomException(msgServ.getSysMsg("no_user"));
 
 		List<UtenteDTO> risultato = listaFiltrata.stream()
 				.map(p -> buildUtenteDTO(p))
