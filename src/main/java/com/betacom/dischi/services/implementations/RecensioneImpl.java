@@ -23,6 +23,7 @@ import com.betacom.dischi.repository.IRecensioneRepository;
 import com.betacom.dischi.request.RecensioneRequest;
 import com.betacom.dischi.services.interfaces.OrdineService;
 import com.betacom.dischi.services.interfaces.RecensioneService;
+import com.betacom.dischi.services.interfaces.SystemMsgServices;
 import com.betacom.dischi.utilities.Utility;
 
 import jakarta.transaction.Transactional;
@@ -35,15 +36,17 @@ public class RecensioneImpl implements RecensioneService {
 	private IClienteRepository clienteRepo;
 	private IProdottoRepository prodottoRepo;
 	private OrdineService ordineServ;
+    private SystemMsgServices msgServ;
 
 	
 	public RecensioneImpl(Logger log, IRecensioneRepository recensioneRepo, IClienteRepository clienteRepo,
-			IProdottoRepository prodottoRepo, OrdineService ordineServ) {
+			IProdottoRepository prodottoRepo, OrdineService ordineServ,SystemMsgServices msgServ) {
 		this.log = log;
 		this.recensioneRepo = recensioneRepo;
 		this.clienteRepo = clienteRepo;
 		this.prodottoRepo = prodottoRepo;
 		this.ordineServ = ordineServ;
+		this.msgServ = msgServ;
 	}
 
 
@@ -65,14 +68,15 @@ public class RecensioneImpl implements RecensioneService {
 		Recensione recensione = new Recensione();
 		checkAndSetFields(recensione,req);
 		recensioneRepo.save(recensione);
-		log.debug("Recensione creata con ID: "+recensione.getIdRecensione() + " e dettagli: " + recensione);
+        log.debug(msgServ.getSysMsg("review_created") + " ID: " + recensione.getIdRecensione());
+
 	}
 
 	@Override
 	@Transactional
 	public void update(RecensioneRequest req) throws CustomException {
 		Recensione recensione = recensioneRepo.findById(req.getIdRecensione())
-				.orElseThrow(() -> new CustomException("Recensione non trovata"));
+                .orElseThrow(() -> new CustomException(msgServ.getSysMsg("no_review")));
 		boolean modifica = false;
 		if (req.getDescrizione() != null) {
 			recensione.setDescrizione(req.getDescrizione());
@@ -86,23 +90,24 @@ public class RecensioneImpl implements RecensioneService {
 			recensione.setDataCreazione(LocalDate.now());
 		}
 		recensioneRepo.save(recensione);
-	}
+        log.debug(msgServ.getSysMsg("review_updated"));
 
+	}
 	@Override
 	@Transactional
 	public void delete(RecensioneRequest req) throws CustomException {
 		log.debug("Delete recensione: "+req);
 		  Recensione recensione = recensioneRepo.findById(req.getIdRecensione())
-		            .orElseThrow(() -> new CustomException("Recensione non trovata"));	
+	                .orElseThrow(() -> new CustomException(msgServ.getSysMsg("no_review")));
 		recensioneRepo.delete(recensione);
-	    log.debug("Recensione con ID: " + req.getIdRecensione() + " eliminata con successo");
+        log.debug(msgServ.getSysMsg("review_deleted") + " ID: " + req.getIdRecensione());
 	}
 
 	private Recensione checkAndSetFields(Recensione recensione,RecensioneRequest req) throws  CustomException {
 		Cliente cliente = clienteRepo.findById(req.getIdCliente())
-				.orElseThrow(() -> new CustomException("Cliente non trovato"));
+                .orElseThrow(() -> new CustomException(msgServ.getSysMsg("no_customer")));
 		Prodotto prodotto = prodottoRepo.findById(req.getIdProdotto())
-				.orElseThrow(() -> new CustomException("Prodotto non trovato"));
+                .orElseThrow(() -> new CustomException(msgServ.getSysMsg("no_product")));
 		checkIfRecensioneAlreadyExists(cliente,prodotto);
 		checkIfClienteAlreadyBoughtProduct(cliente,prodotto.getProdottiOrdine());
 	    checkIfRecensioneRequestHasValidParameters(req);
@@ -114,10 +119,11 @@ public class RecensioneImpl implements RecensioneService {
 
 		return recensione;
 	}
+	
 	private void checkIfRecensioneAlreadyExists(Cliente cliente, Prodotto prodotto) throws CustomException {
 		Boolean recensioneEsistente = recensioneRepo.existsByClienteAndProdotto(cliente, prodotto);
 		if(recensioneEsistente) 
-			throw new CustomException();
+            throw new CustomException(msgServ.getSysMsg("review_already_exists"));
 	}
 	
 	private void checkIfClienteAlreadyBoughtProduct(Cliente cliente, List<ProdottoOrdine> prodottiOrdine) throws CustomException {
@@ -131,18 +137,18 @@ public class RecensioneImpl implements RecensioneService {
 	        } 
 	    }
 	    if (!haAcquistato) 
-	        throw new CustomException("Non è possibile recensire un prodotto non acquistato");
+            throw new CustomException(msgServ.getSysMsg("product_not_bought"));
 	}
 	
 	public void checkIfRecensioneRequestHasValidParameters(RecensioneRequest req) throws CustomException {
 		if(req.getDescrizione() == null || req.getDescrizione().isBlank()) {
-			throw new CustomException("La descrizione non può essere nulla o vuota");
+            throw new CustomException(msgServ.getSysMsg("description_invalid"));
 		}
 		if(req.getStelle() == null) {
-			throw new CustomException("Il campo numero di stelle non può essere nullo o vuoto");
+            throw new CustomException(msgServ.getSysMsg("stars_invalid"));
 		}
 		if(req.getStelle() < 1 || req.getStelle() > 5) {
-			throw new CustomException("Il numero di stelle deve essere un valore tra 1 e 5");
+            throw new CustomException(msgServ.getSysMsg("stars_range_invalid"));
 		}
 	}
 	
@@ -150,11 +156,10 @@ public class RecensioneImpl implements RecensioneService {
 	@Transactional
 	public RecensioneDTO listById(Integer id) throws CustomException {
 	    Recensione recensione = recensioneRepo.findById(id)
-	            .orElseThrow(() -> new CustomException("Recensione non trovata"));
+                .orElseThrow(() -> new CustomException(msgServ.getSysMsg("no_review")));
 	    RecensioneDTO recensioneDTO = Utility.buildRecensioneDTO(recensione);  
 	    return recensioneDTO;
 	}
-
 
 	@Override
 	@Transactional

@@ -14,6 +14,7 @@ import com.betacom.dischi.models.Cliente;
 import com.betacom.dischi.repository.IClienteRepository;
 import com.betacom.dischi.request.ClienteRequest;
 import com.betacom.dischi.services.interfaces.ClienteService;
+import com.betacom.dischi.services.interfaces.SystemMsgServices;
 import com.betacom.dischi.utilities.Utility;
 
 import jakarta.transaction.Transactional;
@@ -27,7 +28,9 @@ public class ClienteImpl implements ClienteService {
 
 	@Autowired
 	IClienteRepository clienteRepo;
-
+	@Autowired
+    SystemMsgServices msgServ;
+	
 	
 	@Override
 	@Transactional
@@ -50,6 +53,8 @@ public class ClienteImpl implements ClienteService {
 	            .idCliente(cliente.getIdCliente()) 
 	            .dataRegistrazione(cliente.getDataRegistrazione())
 	            .build();  
+        log.info(msgServ.getSysMsg("customer_created"));
+
 	    return clienteDTO;  
        
 	}
@@ -60,10 +65,11 @@ public class ClienteImpl implements ClienteService {
 		log.debug("Update Cliente: " + req);
 		Optional<Cliente> optCliente = clienteRepo.findById(req.getIdCliente());
 		Cliente cliente = optCliente
-				.orElseThrow(() -> new CustomException("Id: " + req.getIdCliente() + " del cliente non trovato."));
+                .orElseThrow(() -> new CustomException(msgServ.getSysMsg("no_customer_for_update")));
 		checkAndSetFields(req, cliente);
 		clienteRepo.save(cliente);
-		log.debug("Cliente con ID: " + req.getIdCliente() + " aggiornato."+ " e dettagli: " + cliente);
+        log.info(msgServ.getSysMsg("customer_updated"));
+
 	}
 
 	@Override
@@ -72,9 +78,11 @@ public class ClienteImpl implements ClienteService {
 		log.debug("Delete Cliente: " + req);
 		Optional<Cliente> optCliente = clienteRepo.findById(req.getIdCliente());
 		Cliente cliente = optCliente.orElseThrow(
-				() -> new CustomException("Id: " + req.getIdCliente() + " del cliente da eliminare non trovato"));
+                () -> new CustomException(msgServ.getSysMsg("no_customer_for_delete")));
 		clienteRepo.delete(cliente);
 		log.debug("Cliente con ID: " + req.getIdCliente() + " eliminato con successo.");
+        log.info(msgServ.getSysMsg("customer_deleted"));
+
 	}
 
 	@Override
@@ -82,37 +90,37 @@ public class ClienteImpl implements ClienteService {
 	public ClienteDTO listById(Integer id) throws CustomException {
 		log.debug("Visualizzazione dati cliente con ID: " + id);
 		Cliente cliente = clienteRepo.findById(id)
-				.orElseThrow(() -> new CustomException("Cliente con id " + id + " non trovato"));
+                .orElseThrow(() -> new CustomException(msgServ.getSysMsg("no_customer")));
 		return Utility.buildClienteDTO(cliente);
 	}
 
 	private void checkAndSetFields(ClienteRequest req, Cliente cliente) throws CustomException {
 		if (req.getNome() == null || req.getNome().isBlank()) {
-			throw new CustomException("Il nome non può essere nullo o vuoto");
+            throw new CustomException(msgServ.getSysMsg("name_invalid"));
 		}
 		if (req.getCognome() == null || req.getCognome().isBlank()) {
-			throw new CustomException("Il cognome non può essere nullo o vuoto");
+            throw new CustomException(msgServ.getSysMsg("surname_invalid"));
 		}
 		if (req.getTelefono() == null || req.getTelefono().isBlank()) {
-			throw new CustomException("Il numero di telefono non può essere nullo o vuoto");
+            throw new CustomException(msgServ.getSysMsg("phone_invalid"));
 		}
 		if (req.getComune() == null || req.getComune().isBlank()) {
-			throw new CustomException("Il comune non può essere nullo o vuoto");
+            throw new CustomException(msgServ.getSysMsg("municipality_invalid"));
 		}
 		if (req.getCap() == null || req.getCap().isBlank()) {
-			throw new CustomException("Il cap non può essere nullo o vuoto");
+            throw new CustomException(msgServ.getSysMsg("cap_invalid"));
 		}
 		if (req.getProvincia() == null || req.getProvincia().isBlank()) {
-			throw new CustomException("La provincia non può essere nulla o vuoto");
+            throw new CustomException(msgServ.getSysMsg("province_invalid"));
 		}
 		if (req.getVia() == null || req.getVia().isBlank()) {
-			throw new CustomException("La via non può essere nulla o vuoto");
+            throw new CustomException(msgServ.getSysMsg("address_invalid"));
 		}
 		// ^ -> inizio stringa, \d -> cifra numerica, \\s- -> spazio o trattino, $ fine della stringa
 		// ? -> opzionale
 		String telefonoRegex = "^\\+?\\d{1,3}[\\s-]?\\(?\\d{1,4}\\)?[\\s-]?\\d{1,4}[\\s-]?\\d{1,4}$";
 		if (!req.getTelefono().matches(telefonoRegex)) {
-			throw new CustomException("Numero di telefono non valido, non rispetta formato internazionale");
+            throw new CustomException(msgServ.getSysMsg("phone_format_invalid"));
 		}
 		if (req.getImmagineCliente() == null || req.getImmagineCliente().isBlank()) {
 			cliente.setImmagineCliente(
